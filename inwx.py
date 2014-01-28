@@ -1,14 +1,9 @@
-# !I do not offer any support for this file! #
-
+# ! I do not offer any support for this file ! #
 # I got this file completely from inwx.de.
-# Just converted it with 2to3 to Python 3
-# and fixed a few smaller things.
 
-
-
-import xmlrpc.client
-from xmlrpc.client import _Method
-import urllib.request, urllib.error, urllib.parse
+import xmlrpclib
+from xmlrpclib import _Method
+import urllib2
 
 class domrobot():
     def __init__ (self, address, debug = False):
@@ -22,19 +17,19 @@ class domrobot():
 
     def __request (self, methodname, params):
         tuple_params = tuple([params[0]])
-        requestContent = xmlrpc.client.dumps(tuple_params, methodname)
+        requestContent = xmlrpclib.dumps(tuple_params, methodname)
         if(self.debug == True):
-            print(("Anfrage: "+str(requestContent).replace("\n", "")))
-        headers = { 'User-Agent' : 'DomRobot/'+self.version+' Python-v3.3', 'Content-Type': 'text/xml','content-length': str(len(requestContent))}
+            print("Anfrage: "+str(requestContent).replace("\n", ""))
+        headers = { 'User-Agent' : 'DomRobot/'+self.version+' Python-v2.7', 'Content-Type': 'text/xml','content-length': str(len(requestContent))}
         if(self.cookie!=None):
             headers['Cookie'] = self.cookie
-        req = urllib.request.Request(self.url, requestContent, headers)
-        response = urllib.request.urlopen(req)
+        req = urllib2.Request(self.url, requestContent, headers)
+        response = urllib2.urlopen(req)
         responseContent = response.read()
         cookies = response.info().getheader('Set-Cookie')
         if(self.debug == True):
-            print(("Antwort: "+str(responseContent).replace("\n", "")))
-        apiReturn = xmlrpc.client.loads(responseContent)
+            print ("Antwort: "+str(responseContent).replace("\n", ""))
+        apiReturn = xmlrpclib.loads(responseContent)
         apiReturn = apiReturn[0][0]
         if(apiReturn["code"]!=1000):
             raise NameError('There was a problem: %s (Error code %s)' % (apiReturn['msg'], apiReturn['code']), apiReturn)
@@ -44,7 +39,7 @@ class domrobot():
                 cookies = response.info().getheader('Set-Cookie')
                 self.cookie = cookies
                 if(self.debug == True):
-                    print(("Cookie:" + self.cookie))
+                    print("Cookie:" + self.cookie)
         return apiReturn["resData"]
 
 class prettyprint (object):
