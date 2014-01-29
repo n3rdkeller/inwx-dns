@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 # imports
 import inwx
@@ -22,7 +22,8 @@ def readconfig():
 
 def getip():
     try:
-        localv6 = getaddrinfo(gethostname(), None)[0][4][0])
+        global localv6
+        localv6 = getaddrinfo(gethostname(), None)[0][4][0]
     except:
         pass
 
@@ -48,8 +49,15 @@ def main():
     # get content of the old entry
     old = ninfo["record"][ncount]["content"]
 
-    # TODO
-    # update the record
+    global localv6
+    if (localv6 != None) and (localv6 != old):
+        # update the record
+        print("IP changed from:\n" + old + "\nto:\n" + localv6)
+        try:
+            conn.nameserver.updateRecord({"id": nid, "content": localv6})
+        except KeyError:
+            pass
+        print("Updated Nameserver-Record for server." + domain)
 
 if __name__ == "__main__":
     readconfig()
