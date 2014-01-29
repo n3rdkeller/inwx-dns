@@ -2,7 +2,7 @@
 
 # imports
 import inwx
-from socket import getaddrinfo, gethostname
+from socket import getaddrinfo, gethostname, gethostbyname
 from ConfigParser import ConfigParser
 
 # globals
@@ -10,22 +10,30 @@ api_url = "https://api.domrobot.com/xmlrpc/"
 username = None
 password = None
 domain = None
-localv6 = None
+subdomain = None
+iptype = None
 
 def readconfig():
-    cfg = ConfigParser()
-    cfg.read("config.ini")
-    global username, password, domain
-    username = cfg.get("General", "username")
-    password = cfg.get("General", "password")
-    domain = cfg.get("General", "domain")
-
-def getip():
     try:
-        global localv6
-        localv6 = getaddrinfo(gethostname(), None)[0][4][0]
+        cfg = ConfigParser()
+        cfg.read("config.ini")
+        global username, password, domain, subdomain
+        username = cfg.get("General", "username")
+        password = cfg.get("General", "password")
+        domain = cfg.get("General", "domain")
+        subdomain = cfg.get("General", "subdomain")
+        iptype = int(cfg.get("General", "iptype"))
     except:
-        pass
+        print("Error reading your config.ini. Check and try again.")
+
+def getip(type: int):
+    try:
+        if type == 4: # for ipv4
+            return gethostbyname(socket.gethostname())
+        elif type == 6: # for ipv6 (maybe not working in all OS)
+            return getaddrinfo(gethostname(), None)[0][4][0]
+    except:
+        return None
 
 def main():
     # login credentials
@@ -41,7 +49,7 @@ def main():
     ncount = 0
     # get the one with "server."
     for i in range(len(ninfo["record"])):
-        if ninfo["record"][i]["name"] == ("server." + domain):
+        if ninfo["record"][i]["name"] == (subdomain + "." + domain):
             ncount = i
             break
     # save the id of the entry
@@ -49,17 +57,17 @@ def main():
     # get content of the old entry
     old = ninfo["record"][ncount]["content"]
 
-    global localv6
-    if (localv6 != None) and (localv6 != old):
+    global iptype
+    ip = getip(iptype)
+    if (ip != None) and (ip != old):
         # update the record
-        print("IP changed from:\n" + old + "\nto:\n" + localv6)
+        print("IP changed from:\n" + old + "\nto:\n" + ip)
         try:
-            conn.nameserver.updateRecord({"id": nid, "content": localv6})
+            conn.nameserver.updateRecord({"id": nid, "content": ip})
         except KeyError:
             pass
-        print("Updated Nameserver-Record for server." + domain)
+        print("Updated Nameserver-Record for " + subdomain "." + domain)
 
 if __name__ == "__main__":
     readconfig()
-    getip()
     main()
