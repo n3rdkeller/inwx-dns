@@ -10,15 +10,20 @@ api_url = "https://api.domrobot.com/xmlrpc/"
 username = None
 password = None
 domain = None
+subdomain = None
 localv6 = None
 
 def readconfig():
-    cfg = ConfigParser()
-    cfg.read("config.ini")
-    global username, password, domain
-    username = cfg.get("General", "username")
-    password = cfg.get("General", "password")
-    domain = cfg.get("General", "domain")
+    try:
+        cfg = ConfigParser()
+        cfg.read("config.ini")
+        global username, password, domain, subdomain
+        username = cfg.get("General", "username")
+        password = cfg.get("General", "password")
+        domain = cfg.get("General", "domain")
+        subdomain = cfg.get("General", "subdomain")
+    except:
+        print("Error reading your config.ini. Check and try again.")
 
 def getip():
     try:
