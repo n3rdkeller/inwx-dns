@@ -1,0 +1,13 @@
+# Config File
+config.ini
+
+# Python binaries
+*.pyc
+
+# Generic files
+*~
+*.lock
+*.DS_Store
+*.Trashes
+*.swp
+*.out
