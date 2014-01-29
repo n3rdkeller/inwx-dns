@@ -1,5 +1,5 @@
 # inwx-dns
-This tool was originally made only to update the nameserver record of our domain to the local IP of our homeserver (Dynamic DNS Service). But due to the wish of some friends we updated it to fit for more general purposes (but still only with our registrar).
+This tool was originally made only to update the nameserver record of our domain to the local IP of our homeserver (Dynamic DNS Service). But due to the wish of some friends we updated it to fit more general purposes (but still only with our registrar).
 
 It uses the [XML-API](http://www.inwx.de/de/offer/api) of our registrar [InterNetworX](http://inwx.de/).
 They also build the library we used (`inwx.py`).
@@ -10,7 +10,7 @@ They also build the library we used (`inwx.py`).
 If not, you can change the API-URL in the script to `https://api.ote.domrobot.com/xmlrpc/`. This is the [OT&E](http://ote.inwx.de) API that can be used testing purposes. We only tested `inwx-dns` with the normal API, but it should be the same here.
 
 ## Config-File
-You will need a config-file `config.ini` for this script to work. It's ignored by git because the credentials in this file are not encrypted. Create the file with the following syntax in the repository-folder:
+You will need a config-file `config.ini` for this script to work. It's ignored by git, because the credentials in this file are not encrypted. Create the file with the following syntax in the repository-folder:
 
     [General]
     username=root
