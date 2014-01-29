@@ -49,7 +49,7 @@ def main():
     ncount = 0
     # get the one with "server."
     for i in range(len(ninfo["record"])):
-        if ninfo["record"][i]["name"] == ("server." + domain):
+        if ninfo["record"][i]["name"] == (subdomain + "." + domain):
             ncount = i
             break
     # save the id of the entry
@@ -66,7 +66,7 @@ def main():
             conn.nameserver.updateRecord({"id": nid, "content": ip})
         except KeyError:
             pass
-        print("Updated Nameserver-Record for server." + domain)
+        print("Updated Nameserver-Record for " + subdomain "." + domain)
 
 if __name__ == "__main__":
     readconfig()
