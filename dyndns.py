@@ -2,6 +2,7 @@
 
 # imports
 import inwx
+from socket import getaddrinfo, gethostname
 from ConfigParser import ConfigParser
 
 # globals
@@ -17,6 +18,9 @@ def readconfig():
     username = cfg.get("General", "username")
     password = cfg.get("General", "password")
     domain = cfg.get("General", "domain")
+
+def getip():
+    return (getaddrinfo(gethostname(), None)[0][4][0])
 
 def main():
     # login credentials
@@ -43,4 +47,5 @@ def main():
 
 if __name__ == "__main__":
     readconfig()
+    getip()
     main()
