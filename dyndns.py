@@ -2,7 +2,7 @@
 
 # imports
 import inwx
-from socket import getaddrinfo, gethostname
+from socket import getaddrinfo, gethostname, gethostbyname
 from ConfigParser import ConfigParser
 
 # globals
@@ -11,7 +11,7 @@ username = None
 password = None
 domain = None
 subdomain = None
-localv6 = None
+iptype = None
 
 def readconfig():
     try:
@@ -22,15 +22,18 @@ def readconfig():
         password = cfg.get("General", "password")
         domain = cfg.get("General", "domain")
         subdomain = cfg.get("General", "subdomain")
+        iptype = int(cfg.get("General", "iptype"))
     except:
         print("Error reading your config.ini. Check and try again.")
 
-def getip():
+def getip(type: int):
     try:
-        global localv6
-        localv6 = getaddrinfo(gethostname(), None)[0][4][0]
+        if type == 4: # for ipv4
+            return gethostbyname(socket.gethostname())
+        elif type == 6: # for ipv6 (maybe not working in all OS)
+            return getaddrinfo(gethostname(), None)[0][4][0]
     except:
-        pass
+        return None
 
 def main():
     # login credentials
@@ -54,17 +57,17 @@ def main():
     # get content of the old entry
     old = ninfo["record"][ncount]["content"]
 
-    global localv6
-    if (localv6 != None) and (localv6 != old):
+    global iptype
+    ip = getip(iptype)
+    if (ip != None) and (ip != old):
         # update the record
-        print("IP changed from:\n" + old + "\nto:\n" + localv6)
+        print("IP changed from:\n" + old + "\nto:\n" + ip)
         try:
-            conn.nameserver.updateRecord({"id": nid, "content": localv6})
+            conn.nameserver.updateRecord({"id": nid, "content": ip})
         except KeyError:
             pass
         print("Updated Nameserver-Record for server." + domain)
 
 if __name__ == "__main__":
     readconfig()
-    getip()
     main()
