@@ -7,9 +7,10 @@ from ConfigParser import ConfigParser
 
 # globals
 api_url = "https://api.domrobot.com/xmlrpc/"
-username = ""
-password = ""
-domain = ""
+username = None
+password = None
+domain = None
+localv6 = None
 
 def readconfig():
     cfg = ConfigParser()
@@ -20,7 +21,10 @@ def readconfig():
     domain = cfg.get("General", "domain")
 
 def getip():
-    return (getaddrinfo(gethostname(), None)[0][4][0])
+    try:
+        localv6 = getaddrinfo(gethostname(), None)[0][4][0])
+    except:
+        pass
 
 def main():
     # login credentials
@@ -41,6 +45,8 @@ def main():
             break
     # save the id of the entry
     nid = ninfo["record"][ncount]["id"]
+    # get content of the old entry
+    old = ninfo["record"][ncount]["content"]
 
     # TODO
     # update the record
