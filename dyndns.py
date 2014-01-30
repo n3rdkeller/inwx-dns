@@ -2,6 +2,7 @@
 
 # imports
 import inwx
+import os
 from socket import getaddrinfo, gethostname, gethostbyname
 from ConfigParser import ConfigParser
 from time import strftime
@@ -14,32 +15,41 @@ password = None
 domain = None
 subdomain = None
 iptype = None
+DATEANDTIME_FORMAT = "%d.%m.%y %H:%M:%S"
+LOG_NEWLINE = "\n" + str((len(DATEANDTIME_FORMAT) + 3) * " ")
 
-def log(text: str):
-    if LOG_FILE != None:
-        if not os.path.exists(LOG_FILE):
-            print(dateandtime() + "Logfile doesn't exist. Creating: " + LOG_FILE)
-        f = open(LOG_FILE, "a")
-        f.write(dateandtime() + text + "\n")
+def log(logtext):
+    if logfile != None:
+        if not os.path.exists(logfile):
+            print(dateandtime() + "Logfile doesn't exist. Creating: " + logfile)
+        f = open(logfile, "a")
+        f.write(dateandtime() + logtext + "\n")
         f.close()
-    print(dateandtime() + text)
+    print(dateandtime() + logtext)
 
-def dateandtime() -> str:
-    DATEANDTIME_FORMAT = "%d.%m.%y %H:%M:%S"
+def dateandtime():
     return strftime("[" + DATEANDTIME_FORMAT + "] ")
 
 def readconfig():
     try:
         cfg = ConfigParser()
         cfg.read("config.ini")
-        global username, password, domain, subdomain
+        global username, password, domain, subdomain, logfile
         username = cfg.get("General", "username")
         password = cfg.get("General", "password")
         domain = cfg.get("General", "domain")
         subdomain = cfg.get("General", "subdomain")
         iptype = int(cfg.get("General", "iptype"))
+        try:
+            logfile = cfg.get("General", "logfile")
+            log("Now logging to " + logfile + ".")
+        except:
+            log("No logfile provided. Shell-logging only.")
+            logfile = None
+        return True
     except:
-        print("Error reading your config.ini. Check and try again.")
+        log("Error reading your config.ini. Check and try again.")
+        return False
 
 def getip(type: int):
     try:
@@ -76,12 +86,15 @@ def main():
     ip = getip(iptype)
     if (ip != None) and (ip != old):
         # update the record
-        print("IP changed from:\n" + old + "\nto:\n" + ip)
+        log("IP changed from:" + LOG_NEWLINE + old + \
+            LOG_NEWLINE + "to:" + LOG_NEWLINE + ip)
         try:
             conn.nameserver.updateRecord({"id": nid, "content": ip})
         except KeyError:
             pass
-        print("Updated Nameserver-Record for " + subdomain "." + domain)
+        except Exception, e:
+            log("Error occured: " + e)
+        log("Updated Nameserver-Record for " + subdomain + "." + domain)
 
 if __name__ == "__main__":
     readconfig()
