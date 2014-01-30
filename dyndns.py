@@ -4,14 +4,29 @@
 import inwx
 from socket import getaddrinfo, gethostname, gethostbyname
 from ConfigParser import ConfigParser
+from time import strftime
 
 # globals
 api_url = "https://api.domrobot.com/xmlrpc/"
+logfile = None
 username = None
 password = None
 domain = None
 subdomain = None
 iptype = None
+
+def log(text: str):
+    if LOG_FILE != None:
+        if not os.path.exists(LOG_FILE):
+            print(dateandtime() + "Logfile doesn't exist. Creating: " + LOG_FILE)
+        f = open(LOG_FILE, "a")
+        f.write(dateandtime() + text + "\n")
+        f.close()
+    print(dateandtime() + text)
+
+def dateandtime() -> str:
+    DATEANDTIME_FORMAT = "%d.%m.%y %H:%M:%S"
+    return strftime("[" + DATEANDTIME_FORMAT + "] ")
 
 def readconfig():
     try:
