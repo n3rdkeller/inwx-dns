@@ -51,11 +51,11 @@ def readconfig():
         log("Error reading your config.ini. Check and try again.")
         return False
 
-def getip(type: int):
+def getip(iptype):
     try:
-        if type == 4: # for ipv4
+        if iptype == 4: # for ipv4 (only local)
             return gethostbyname(socket.gethostname())
-        elif type == 6: # for ipv6 (maybe not working in all OS)
+        elif iptype == 6: # for ipv6 (maybe not working in all OS)
             return getaddrinfo(gethostname(), None)[0][4][0]
     except:
         return None
@@ -97,5 +97,7 @@ def main():
         log("Updated Nameserver-Record for " + subdomain + "." + domain)
 
 if __name__ == "__main__":
-    readconfig()
-    main()
+    if readconfig():
+        main()
+    else:
+        log("Exited without doing anything.")
