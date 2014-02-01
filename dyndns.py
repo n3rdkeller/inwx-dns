@@ -108,7 +108,7 @@ def main():
             conn.nameserver.updateRecord({"id": nid, "content": ip})
         except KeyError:
             log("Successfully updated nameserver-record for: " + LOG_NEWLINE + \
-             + subdomain + "." + domain)
+                subdomain + "." + domain)
         except Exception as e:
             log("Error occured: " + str(e))
             log("Check the setup of your nameserver-record." + LOG_NEWLINE + \
