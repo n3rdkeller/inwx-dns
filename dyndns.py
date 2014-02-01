@@ -32,6 +32,7 @@ def dateandtime():
 
 def readconfig():
     try:
+        log("Start reading config.ini")
         cfg = ConfigParser()
         cfg.read("config.ini")
         global username, password, domain, subdomain, logfile
@@ -94,12 +95,13 @@ def main():
             pass
         except Exception, e:
             log("Error occured: " + e)
-        log("Updated Nameserver-Record for " + subdomain + "." + domain)
+        log("Updated nameserver-record for " + subdomain + "." + domain)
     else:
         log("IP was not updated.")
 
 if __name__ == "__main__":
+    log("Started program.")
     if readconfig():
         main()
     else:
-        log("Exited without doing anything.")
+        log("Exited without doing anything due to an error.")
