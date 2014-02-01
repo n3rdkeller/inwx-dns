@@ -3,12 +3,14 @@
 # imports
 import inwx
 import os
+from urllib2 import urlopen
 from socket import getaddrinfo, gethostname, gethostbyname
 from ConfigParser import ConfigParser
 from time import strftime
 
 # globals
-api_url = "https://api.domrobot.com/xmlrpc/"
+api_url = "https://api.domrobot.com/xmlrpc/" # this is the url of the API
+ipecho = "http://ipecho.net/plain" # this is the URL where the public IPv4 comes from
 logfile = None
 username = None
 password = None
@@ -32,10 +34,10 @@ def dateandtime():
 
 def readconfig():
     try:
-        log("Start reading config.ini")
+        log("Start reading config.ini.")
         cfg = ConfigParser()
         cfg.read("config.ini")
-        global username, password, domain, subdomain, logfile
+        global username, password, domain, subdomain, iptype, logfile
         username = cfg.get("General", "username")
         password = cfg.get("General", "password")
         domain = cfg.get("General", "domain")
@@ -52,13 +54,20 @@ def readconfig():
         log("Error reading your config.ini. Check and try again.")
         return False
 
-def getip(iptype):
+def getip(ip_type):
     try:
-        if iptype == 4: # for ipv4 (only local)
-            return gethostbyname(socket.gethostname())
-        elif iptype == 6: # for ipv6 (maybe not working in all OS)
-            return getaddrinfo(gethostname(), None)[0][4][0]
+        log("Now fetching your IPv" + str(ip_type) + "...")
+        if ip_type == 4: # for ipv4
+            url_socket = urlopen(ipecho)
+            fetchedip = url_socket.read()
+            url_socket.close()
+        elif ip_type == 6: # for ipv6 (maybe not working in all OS)
+            fetchedip = getaddrinfo(gethostname(), None)[0][4][0]
+        log("Fetched your IP without errors:" + LOG_NEWLINE + fetchedip)
+        return fetchedip
     except:
+        log("Error fetching your IPv" + str(ip_type) + LOG_NEWLINE + \
+            "Check your internet connection.")
         return None
 
 def main():
@@ -93,11 +102,14 @@ def main():
             conn.nameserver.updateRecord({"id": nid, "content": ip})
         except KeyError:
             pass
-        except Exception, e:
-            log("Error occured: " + e)
+        except Exception as e:
+            log("Error occured: " + str(e))
+            log("Check the setup of your nameserver-record." + LOG_NEWLINE + \
+                "Maybe your IP-version mismatched with the recorded one.")
+            exit()
         log("Updated nameserver-record for " + subdomain + "." + domain)
     else:
-        log("IP was not updated.")
+        log("Old and current IP were the same. No update required.")
 
 if __name__ == "__main__":
     log("Started program.")

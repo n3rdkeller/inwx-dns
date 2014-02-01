@@ -1,6 +1,9 @@
 # Config File
 config.ini
 
+# Default Log File
+dyndns.log
+
 # Python binaries
 *.pyc
 
