@@ -95,6 +95,8 @@ def main():
         except Exception, e:
             log("Error occured: " + e)
         log("Updated Nameserver-Record for " + subdomain + "." + domain)
+    else:
+        log("IP was not updated.")
 
 if __name__ == "__main__":
     if readconfig():
