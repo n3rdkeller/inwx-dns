@@ -59,14 +59,19 @@ def getip(ip_type):
         log("Now fetching your IPv" + str(ip_type) + "...")
         if ip_type == 4: # for ipv4
             url_socket = urlopen(ipecho)
-            fetchedip = url_socket.read()
+            url_source = url_socket.read()
+            from re import findall
+            pattern = "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" + \
+                        "\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b"
+            fetchedips = findall(pattern, url_source)
+            fetchedip = fetchedips[0]
             url_socket.close()
         elif ip_type == 6: # for ipv6 (maybe not working in all OS)
             fetchedip = getaddrinfo(gethostname(), None)[0][4][0]
         log("Fetched your IP without errors:" + LOG_NEWLINE + fetchedip)
         return fetchedip
     except:
-        log("Error fetching your IPv" + str(ip_type) + LOG_NEWLINE + \
+        log("Error fetching your IPv" + str(ip_type) + "." + LOG_NEWLINE + \
             "Check your internet connection.")
         return None
 
@@ -99,17 +104,19 @@ def main():
         log("IP changed from:" + LOG_NEWLINE + old + \
             LOG_NEWLINE + "to:" + LOG_NEWLINE + ip)
         try:
+            log("Now updating record...")
             conn.nameserver.updateRecord({"id": nid, "content": ip})
         except KeyError:
-            pass
+            log("Successfully updated nameserver-record for: " + LOG_NEWLINE + \
+             + subdomain + "." + domain)
         except Exception as e:
             log("Error occured: " + str(e))
             log("Check the setup of your nameserver-record." + LOG_NEWLINE + \
                 "Maybe your IP-version mismatched with the recorded one.")
-            exit()
-        log("Updated nameserver-record for " + subdomain + "." + domain)
-    else:
+    elif (ip == old):
         log("Old and current IP were the same. No update required.")
+    elif (ip == None):
+        log("Did not update anything.")
 
 if __name__ == "__main__":
     log("Started program.")
